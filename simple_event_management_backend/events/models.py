@@ -15,6 +15,12 @@ class Event(models.Model):
     datetime = models.DateTimeField()
     location_address = models.CharField(max_length=255)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    attendees = models.ManyToManyField(
+        User,
+        through='EventAttendance',
+        through_fields=('event', 'attendee'),
+        related_name='event_attendees'
+    )
 
     def __str__(self):
         return self.title
