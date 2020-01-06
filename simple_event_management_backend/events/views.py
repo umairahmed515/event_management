@@ -11,6 +11,9 @@ from rest_framework import viewsets
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
+from rest_framework.response import Response
+from rest_framework import permissions
+from rest_framework import status
 
 
 class EventDetailView(DetailView):
@@ -24,7 +27,21 @@ class EventDetailView(DetailView):
 
 event_get_view = EventDetailView.as_view()
 
-
 class EventViewSet(viewsets.ModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Event.objects.all()
     serializer_class = EventSerializer
+
+    def update(self, request, *args, **kwargs):
+        event = self.get_object()
+        serializer = EventSerializer(event, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        event = self.get_object()
+        event.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
