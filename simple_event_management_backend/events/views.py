@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from simple_event_management_backend.events.models import Event
-from .serializers import EventSerializer
+from .serializers import EventSerializer, EventAttendanceSerializer
 from rest_framework import viewsets
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -14,6 +14,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework import permissions
 from rest_framework import status
+from rest_framework.generics import UpdateAPIView
 
 
 class EventDetailView(DetailView):
@@ -52,3 +53,21 @@ class EventViewSet(viewsets.ModelViewSet):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(status=status.HTTP_403_FORBIDDEN)
+
+class EventAttendanceViewSet(UpdateAPIView):
+
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = EventAttendanceSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer_data = { 'user_id': request.data['user_id'], 'event_id': request.data['event_id']}
+        serializer = self.serializer_class(
+            request.user, data=serializer_data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        data = serializer.save()
+        serialized_data = EventSerializer(data)
+
+        return Response(serialized_data.data, status=status.HTTP_200_OK)
+
+event_attendance_view = EventAttendanceViewSet.as_view()

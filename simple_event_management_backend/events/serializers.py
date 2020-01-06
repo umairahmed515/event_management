@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from simple_event_management_backend.events.models import Event
+from simple_event_management_backend.events.models import Event, EventAttendance
 import datetime
 from django.contrib.auth import get_user_model
 
@@ -12,9 +12,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id','username','name','mobile_number')
 
+
 class EventSerializer(serializers.ModelSerializer):
     owner = UserSerializer()
-    
+
     class Meta:
         model = Event
         fields = ('id', 'title', 'description','datetime','location_address','owner')
@@ -39,3 +40,18 @@ class EventSerializer(serializers.ModelSerializer):
         instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         return instance
+
+class EventAttendanceSerializer(serializers.Serializer):
+    user_id = serializers.UUIDField()
+    event_id = serializers.IntegerField()
+
+    class Meta:
+        model = Event
+        fields = ['__all__']
+
+    @classmethod
+    def update(self, instance, validated_data):
+        event = Event.objects.get(id=validated_data['event_id'])
+        event.attendees.add(validated_data['user_id'])
+        event.save()
+        return event
