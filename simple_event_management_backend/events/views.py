@@ -17,17 +17,6 @@ from rest_framework import status
 from rest_framework.generics import UpdateAPIView
 
 
-class EventDetailView(DetailView):
-
-    model = Event
-
-    def get(self, request, *args, **kwargs):
-        queryset = Event.objects.all()
-        event_names = [eve.title for eve in queryset]
-        return HttpResponse(event_names)
-
-event_get_view = EventDetailView.as_view()
-
 class EventViewSet(viewsets.ModelViewSet):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
