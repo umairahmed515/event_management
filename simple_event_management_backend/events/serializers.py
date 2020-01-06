@@ -5,14 +5,14 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
+
 class EventSerializer(serializers.ModelSerializer):
-    #event_owner = serializers.CharField(source='owner.username')
+
     class Meta:
         model = Event
-        fields = ('title', 'description','datetime','location_address','owner')
+        fields = ('id', 'title', 'description','datetime','location_address','owner')
     
     def create(self, validated_data):
-        print(validated_data)
         user = User.objects.get(username=validated_data['owner'])
         event = Event(
             title=validated_data['title'],
@@ -23,3 +23,12 @@ class EventSerializer(serializers.ModelSerializer):
         )
         event.save()
         return event
+    
+    def update(self, instance, validated_data):
+        instance.title = validated_data.get('title', instance.title)
+        instance.description = validated_data.get('description', instance.description)
+        instance.datetime = validated_data.get('datetime', instance.datetime)
+        instance.location_address = validated_data.get('location_address', instance.location_address)
+        instance.owner = validated_data.get('owner', instance.owner)
+        instance.save()
+        return instance
