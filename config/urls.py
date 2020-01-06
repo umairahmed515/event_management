@@ -16,6 +16,7 @@ urlpatterns = [
     path("users/", include("simple_event_management_backend.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
+    path("events/", include("simple_event_management_backend.events.urls", namespace="events")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
