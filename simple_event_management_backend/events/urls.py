@@ -11,7 +11,7 @@ app_name = "events"
 
 #Routes define using DRF
 router = routers.DefaultRouter()
-router.register(r'event_team', views.EventViewSet)
+router.register(r'event', views.EventViewSet)
 router.register(r'event_details', views.EventDetailViewSet)
 
 #Django Views Routes
