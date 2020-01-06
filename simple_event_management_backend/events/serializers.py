@@ -6,8 +6,15 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
-class EventSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
 
+    class Meta:
+        model = User
+        fields = ('id','username','name','mobile_number')
+
+class EventSerializer(serializers.ModelSerializer):
+    owner = UserSerializer()
+    
     class Meta:
         model = Event
         fields = ('id', 'title', 'description','datetime','location_address','owner')
