@@ -35,13 +35,20 @@ class EventViewSet(viewsets.ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         event = self.get_object()
-        serializer = EventSerializer(event, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        user = request.user
+        if request.user == event.owner:
+            serializer = EventSerializer(event, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
 
     def destroy(self, request, pk=None):
         event = self.get_object()
-        event.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        if request.user == event.owner:
+            event.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(status=status.HTTP_403_FORBIDDEN)
