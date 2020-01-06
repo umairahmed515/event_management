@@ -55,3 +55,17 @@ class EventAttendanceSerializer(serializers.Serializer):
         event.attendees.add(validated_data['user_id'])
         event.save()
         return event
+
+class EventAttendeesSerializer(serializers.ModelSerializer):
+    attendee = UserSerializer()
+    class Meta:
+        model = EventAttendance
+        fields = ('attendee', 'event')
+
+class EventAttendeesDetailSerializer(serializers.ModelSerializer):
+    owner = UserSerializer()
+    attendants = EventAttendeesSerializer(many=True)
+
+    class Meta:
+        model = Event
+        fields = ('id', 'title', 'description','datetime','location_address','owner','attendants')

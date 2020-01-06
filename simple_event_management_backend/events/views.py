@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from simple_event_management_backend.events.models import Event
-from .serializers import EventSerializer, EventAttendanceSerializer
+from .serializers import EventSerializer, EventAttendanceSerializer, EventAttendeesDetailSerializer
 from rest_framework import viewsets
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -71,3 +71,9 @@ class EventAttendanceViewSet(UpdateAPIView):
         return Response(serialized_data.data, status=status.HTTP_200_OK)
 
 event_attendance_view = EventAttendanceViewSet.as_view()
+
+class EventDetailViewSet(viewsets.ModelViewSet):
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    queryset = Event.objects.all()
+    serializer_class = EventAttendeesDetailSerializer
