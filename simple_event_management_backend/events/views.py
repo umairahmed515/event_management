@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.http import HttpResponse
 from simple_event_management_backend.events.models import Event
-from .serializers import EventSerializer, EventAttendanceSerializer, EventAttendeesDetailSerializer
+from .serializers import EventSerializer, EventAttendanceSerializer, EventAttendeesDetailSerializer, EventCreateSerializer
 from rest_framework import viewsets
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -21,13 +21,23 @@ class EventViewSet(viewsets.ModelViewSet):
 
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     queryset = Event.objects.all()
-    serializer_class = EventSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return EventCreateSerializer
+        return EventSerializer
+
+    def create(self, request):
+        serializer = EventCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
     def update(self, request, *args, **kwargs):
         event = self.get_object()
         user = request.user
         if request.user == event.owner:
-            serializer = EventSerializer(event, data=request.data)
+            serializer = EventCreateSerializer(event, data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data)

@@ -19,6 +19,12 @@ class EventSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ('id', 'title', 'description','datetime','location_address','owner')
+
+class EventCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Event
+        fields = ('id', 'title', 'description','datetime','location_address','owner')
     
     def create(self, validated_data):
         user = User.objects.get(username=validated_data['owner'])
